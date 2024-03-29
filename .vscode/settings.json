@@ -1,0 +1,18 @@
+{
+    "python.REPL.enableREPLSmartSend": false,
+    "python.analysis.typeCheckingMode": "basic",
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "Log"
+    ],
+    "spellright.parserByClass": {
+        "Log": {
+            "parser": "code"
+        }
+    }
+}
