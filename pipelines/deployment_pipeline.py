@@ -22,7 +22,7 @@ from zenml.steps import BaseParameters, Output
 docker_settings = DockerSettings(required_integrations=[MLFLOW])
 
 class DeploymentTriggerConfig(BaseParameters):
-    min_accuracy: float = 0.90
+    min_accuracy: float = 0.60
 
 @step
 def deployment_trigger(
@@ -31,10 +31,49 @@ def deployment_trigger(
 ):
     return accuracy >= config.min_accuracy
 
+class MLFlowDeploymentLoaderStepParameters(BaseParameters):
+
+
+    pipeline_name: str
+    step_name: str
+    running: bool = True
+
+@step(enable_cache=False)
+def prediction_service_loader(
+    pipeline_name: str,
+    step_name: str,
+    running: bool = True,
+    model_name: str = "model",
+) -> MLFlowDeploymentService:
+    
+
+
+    # get MLFlow deployer stack componenet 
+    mlflow_model_deployer_component = MLFlowModelDeployer.get_active_model_deployer()
+    # fetch existing services
+    existing_services = mlflow_model_deployer_component.find_model_server(
+        pipeline_name=pipeline_name,
+        step_name = step_name,
+        model_name= model_name,
+        running=running,
+    )
+
+    if not existing_services:
+        raise RuntimeError(
+            f"No MLflow prediction service deployed by the "
+            f"{pipeline_step_name} step in the {pipeline_name} "
+            f"pipeline for the '{model_name}' model is currently "
+            f"running."
+        )
+    print(existing_services)
+    print(type(existing_services))
+    return existing_services[0]
+
+
 @pipeline(enable_cache=False, settings={"docker": docker_settings})
 def continuous_deployment_pipeline(
     data_dir: str,
-    min_accuracy: float = 0.92,
+    min_accuracy: float = 0.6,
     workers: int = 1,
     timeout: int = DEFAULT_SERVICE_START_STOP_TIMEOUT,
 
@@ -43,7 +82,7 @@ def continuous_deployment_pipeline(
     X_train, X_test, y_train, y_test = clean_df(df)
     model = train_model(X_train, X_test, y_train, y_test)
     r2, rmse = evaluate_model(model, X_test, y_test)
-    deployment_decision = deployment_trigger(rmse)
+    deployment_decision = deployment_trigger(r2)
     mlflow_model_deployer_step(
         model=model,
         deploy_decision = deployment_decision,

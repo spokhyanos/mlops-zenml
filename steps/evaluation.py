@@ -38,12 +38,15 @@ def evaluate_model(model: RegressorMixin,
         prediction = model.predict(X_test)
         mse = MSE().calculate_score(y_test, prediction )
         mlflow.log_metric("mse", mse)
+        print("mse: {}",mse)
 
         r2 = R2().calculate_score(y_test, prediction)
         mlflow.log_metric("r2", r2)
+        print("r2: {}",r2)
 
         rmse = RMSE().calculate_score(y_test, prediction)
         mlflow.log_metric("rmse", rmse)
+        print("rmse: {}",rmse)
 
         return r2, rmse
     except Exception as ex:

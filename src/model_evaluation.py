@@ -33,7 +33,7 @@ class R2(ModelEvaluation):
     def calculate_score(self, y_true: np.ndarray, y_pred: np.ndarray):
 
         try:
-            logging.info("Calculating R2")
+            logging.info("clear R2")
             r2 = r2_score(y_true, y_pred)
             logging.info("MSE: {}".format(r2))
             return r2

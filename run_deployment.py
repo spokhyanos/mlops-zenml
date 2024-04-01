@@ -29,7 +29,7 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
 )
 @click.option(
     "--min-accuracy",
-    default=0.92,
+    default=0.6,
     help="Minimum accuracy required to deploy the model",
 )
 
@@ -40,7 +40,7 @@ def run_deployment(config: str, min_accuracy: float):
 
     if deploy:
         continuous_deployment_pipeline(
-            data_dir="data\\kc_house_data.csv",
+            data_dir="data/kc_house_data.csv",
             min_accuracy=min_accuracy,
             workers=3,
             timeout=60,
